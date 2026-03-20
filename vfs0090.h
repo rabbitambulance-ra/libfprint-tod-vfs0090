@@ -28,6 +28,8 @@ GType fpi_tod_shared_driver_get_type (void);
 
 #define DMI_PRODUCT_NAME_NODE "/sys/class/dmi/id/product_name"
 #define DMI_PRODUCT_SERIAL_NODE "/sys/class/dmi/id/product_serial"
+#define VFS_ENV_PRODUCT_NAME "VFS0090_PRODUCT_NAME"
+#define VFS_ENV_PRODUCT_SERIAL "VFS0090_PRODUCT_SERIAL"
 
 #define VFS_USB_TIMEOUT 3000
 #define VFS_USB_INTERRUPT_TIMEOUT 0

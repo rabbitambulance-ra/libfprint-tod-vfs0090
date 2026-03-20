@@ -531,9 +531,24 @@ static void
 generate_main_seed (FpDevice *dev, VfsInit *vinit)
 {
   char name[NAME_MAX], serial[NAME_MAX];
+  const gchar *override_name = NULL;
+  const gchar *override_serial = NULL;
   FILE *name_file, *serial_file;
   int name_len, serial_len;
   GError *error = NULL;
+
+  override_name = g_getenv (VFS_ENV_PRODUCT_NAME);
+  override_serial = g_getenv (VFS_ENV_PRODUCT_SERIAL);
+
+  if (override_name && *override_name && override_serial && *override_serial)
+    {
+      g_strlcpy (name, override_name, sizeof (name));
+      g_strlcpy (serial, override_serial, sizeof (serial));
+
+      fp_info ("Using %s/%s override for VFS0090 pairing identity",
+               VFS_ENV_PRODUCT_NAME, VFS_ENV_PRODUCT_SERIAL);
+      goto build_seed;
+    }
 
   if (!(name_file = fopen (DMI_PRODUCT_NAME_NODE, "r")))
     {
@@ -574,6 +589,7 @@ generate_main_seed (FpDevice *dev, VfsInit *vinit)
       goto out_closeall;
     }
 
+build_seed:
   name_len = strlen (name);
   serial_len = strlen (serial);
   vinit->main_seed_length = name_len + serial_len + 2;
@@ -581,6 +597,9 @@ generate_main_seed (FpDevice *dev, VfsInit *vinit)
 
   memcpy (vinit->main_seed, name, name_len + 1);
   memcpy (vinit->main_seed + name_len + 1, serial, serial_len + 1);
+
+  if (override_name && *override_name && override_serial && *override_serial)
+    return;
 
 out_closeall:
   fclose (serial_file);
